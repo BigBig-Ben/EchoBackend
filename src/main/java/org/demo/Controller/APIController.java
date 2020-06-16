@@ -2,27 +2,27 @@ package org.demo.Controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.demo.Entity.*;
 import org.demo.service.*;
 import org.demo.util.SensitiveWordTree;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jackson.JsonObjectDeserializer;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import sun.misc.Perf;
 
 @RestController
 @RequestMapping(path = "/api")
@@ -68,15 +68,15 @@ public class APIController {
         String icon = user.getIcon();
         JSONArray array = new JSONArray();
         List<Voice> voices = new ArrayList<Voice>(user.getVoices());
-        for (Voice v : voices) {
+        for (Voice voice : voices) {
             JSONObject temp = new JSONObject();
-            temp.put("VoiceId", v.getId());
+            temp.put("VoiceId", voice.getId());
             temp.put("VoiceIcon", icon);
-            temp.put("VoiceDesc", v.getContent());
-            temp.put("VoiceImgs", v.getImgs());
-            temp.put("VoiceLike", v.getStars());
+            temp.put("VoiceDesc", voice.getContent());
+            temp.put("VoiceImgs", voice.getImgs());
+            temp.put("VoiceLike", voice.getWhoLikes().size());
             //temp.put("VoiceTime", format1.format(v.getTime().getTime()));
-            temp.put("VoiceTime", v.getTime().getTime());
+            temp.put("VoiceTime", voice.getTime().getTime());
             array.add(temp);
         }
         json.put("Voices", array);
@@ -85,42 +85,55 @@ public class APIController {
 
     @RequestMapping(path = "/getOneVoice")
     public JSONObject getOneVoice(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        JSONObject obj = new JSONObject();
-        int id = Integer.parseInt(request.getParameter("VoiceId"));
-        Voice voice = voiceService.getVoiceById(id);
-        User user = voice.getHost();
-        obj.put("VoiceID", voice.getId());
-        obj.put("VoiceIcon", user.getIcon());
-        obj.put("VoiceDesc", voice.getContent());
-        obj.put("VoiceImgs", voice.getImgs());
-        obj.put("VoiceLike", voice.getStars());
-        //obj.put("VoiceTime", format1.format(voice.getTime().getTime()));
-        obj.put("VoiceTime", voice.getTime().getTime());
+        JSONObject json = new JSONObject();
+        int voiceId = Integer.parseInt(request.getParameter("VoiceId"));
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+        Voice voice = voiceService.getVoiceById(voiceId);
+        User user = userService.findById(userId);
 
-        return obj;
+        json.put("VoiceID", voice.getId());
+        json.put("VoiceIcon", user.getIcon());
+        json.put("VoiceDesc", voice.getContent());
+        json.put("VoiceImgs", voice.getImgs());
+        json.put("VoiceLike", voice.getWhoLikes().size());
+        //obj.put("VoiceTime", format1.format(voice.getTime().getTime()));
+        json.put("VoiceTime", voice.getTime().getTime());
+        Set<Voice> likedVoices = user.getLikeVoices();
+        if (likedVoices.contains(voice))
+            json.put("VoiceHasLiked", Boolean.TRUE);
+        else json.put("VoiceHasLiked", Boolean.FALSE);
+        return json;
     }
 
     @RequestMapping(path = "/getVoiceComment")
     public JSONArray getVoiceComment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONArray array = new JSONArray();
-        int id = Integer.parseInt(request.getParameter("VoiceId"));
-        Voice voice = voiceService.getVoiceById(id);
+        int voiceId = Integer.parseInt(request.getParameter("VoiceId"));
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+        Voice voice = voiceService.getVoiceById(voiceId);
+        User user = userService.findById(userId);
+
         List<Comment> comments = new ArrayList<Comment>(voice.getComments());
         Collections.reverse(comments);
-        for (Comment c : comments) {
-            JSONObject temp = new JSONObject();
-            temp.put("UserId", c.getHost().getId());
-            temp.put("CommentID", c.getId());
-            temp.put("CommentIcon", c.getHost().getIcon());
-            temp.put("CommentType", c.getType());
-            temp.put("CommentDesc", c.getContent());
-            temp.put("CommentLike", c.getStars());
+        for (Comment comment : comments) {
+            JSONObject json = new JSONObject();
+            json.put("UserId", comment.getHost().getId());
+            json.put("CommentID", comment.getId());
+            json.put("CommentIcon", comment.getHost().getIcon());
+            json.put("CommentType", comment.getType());
+            json.put("CommentDesc", comment.getContent());
+            json.put("CommentLike", comment.getWhoLikes().size());
             //if(c.getType() == 0)
             //temp.put("CommentedUserID", c.getCommented().getId());
-            temp.put("CommentTime", c.getTime());
+            json.put("CommentTime", comment.getTime().getTime());
             //temp.put("CommentTime", format1.format(c.getTime()));
-            temp.put("CommentedNo", c.getFloor());
-            array.add(temp);
+            json.put("CommentedNo", comment.getFloor());
+
+            Set<Comment> likedComments = user.getComments();
+            if (likedComments.contains(comment))
+                json.put("CommentHasLiked", Boolean.TRUE);
+            else json.put("CommentHasLiked", Boolean.FALSE);
+            array.add(json);
         }
         return array;
     }
@@ -136,18 +149,18 @@ public class APIController {
             voices = voiceService.findOrderByTimeDesc();
         }
         //voices = voiceService.getAll();
-        for (Voice v : voices) {
+        for (Voice voice : voices) {
             JSONObject temp = new JSONObject();
-            temp.put("VoiceId", v.getId());
-            temp.put("VoiceIcon", v.getHost().getIcon());
-            temp.put("VoiceDesc", v.getContent());
-            List<String> imgs = v.getImgs();
+            temp.put("VoiceId", voice.getId());
+            temp.put("VoiceIcon", voice.getHost().getIcon());
+            temp.put("VoiceDesc", voice.getContent());
+            List<String> imgs = voice.getImgs();
             String[] imgsss = imgs.toArray(new String[imgs.size()]);
             temp.put("VoiceImgs", imgsss);
-            temp.put("VoiceLike", v.getStars());
+            temp.put("VoiceLike", voice.getWhoLikes().size());
             //temp.put("VoiceTime", format1.format(v.getTime().getTime()));
-            temp.put("VoiceTime", v.getTime().getTime());
-            temp.put("CommentCnt", v.getComments().size());
+            temp.put("VoiceTime", voice.getTime().getTime());
+            temp.put("CommentCnt", voice.getComments().size());
             array.add(temp);
         }
         return array;
@@ -160,6 +173,7 @@ public class APIController {
         int userId = Integer.parseInt(request.getParameter("UserId"));
         String content = request.getParameter("VoiceDesc");
         String res = SensitiveWordTree.censorWords(content);
+        System.out.println("sensitive tree res: " + res);
         if (!res.equals("未匹配到敏感词")) {
             json.put("type", "illegal");
             return json;
@@ -176,11 +190,6 @@ public class APIController {
             System.out.println(temp.get(i));
             voice.getImgsSet().add(temp.get(i).toString());
         }
-//		for(int i=0; i<java.lang.reflect.Array.getLength(imgs); i++)
-//		{
-//			System.out.println(imgs[i]);
-//			voice.getImgs().add(imgs[i]);
-//		}
         voiceService.save(voice);
         return json;
     }
@@ -245,14 +254,25 @@ public class APIController {
 
     @RequestMapping(path = "/VoiceLike")
     public JSONObject voiceLike(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("voice like start");
         JSONObject json = new JSONObject();
         int voiceId = Integer.parseInt(request.getParameter("VoiceId"));
+        int userId = Integer.parseInt(request.getParameter("UserId"));
         String type = request.getParameter("type");
+
         Voice voice = voiceService.getVoiceById(voiceId);
-        if (type.equals("true")) {
+        User user = userService.findById(userId);
+
+        if (type.equals("like")) {
+            // like
+            userService.likeVoice(userId, voiceId);
             voice.starsInc();
-        } else voice.starsDec();
+            System.out.println("like");
+        } else {
+            // dislike
+            userService.dislikeVoice(userId, voiceId);
+            voice.starsDec();
+            System.out.println("dislike");
+        }
         voiceService.update(voice);
         return json;
     }
@@ -261,13 +281,120 @@ public class APIController {
     public JSONObject commentLike(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         System.out.println("comment like start");
         JSONObject json = new JSONObject();
-        int voiceId = Integer.parseInt(request.getParameter("CommentId"));
+        int commentId = Integer.parseInt(request.getParameter("CommentId"));
+        int userId = Integer.parseInt(request.getParameter("UserId"));
         String type = request.getParameter("type");
-        Comment comment = commentService.findById(voiceId);
-        if (type.equals("true")) {
+
+        Comment comment = commentService.findById(commentId);
+        User user = userService.findById(userId);
+
+        if (type.equals("like")) {
+            userService.likeComment(userId, commentId);
             comment.starsInc();
-        } else comment.starsDec();
+        } else {
+            userService.dislikeComment(userId, commentId);
+            comment.starsDec();
+        }
         commentService.update(comment);
         return json;
+    }
+
+    @RequestMapping(path = "/getDateTags")
+    public JSONArray getDateTags(HttpServletRequest request, HttpServletRequest response) throws ServletException, IOException {
+        JSONArray array = new JSONArray();
+        List<Tag> tags = tagService.getAll();
+        for (Tag tag : tags) {
+            int id = tag.getId();
+            String content = tag.getContent();
+            JSONObject json = new JSONObject();
+            json.put("id", id);
+            json.put("name", content);
+            array.add(json);
+        }
+        return array;
+    }
+
+    @RequestMapping(path = "/addDate")
+    public JSONObject addDate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONObject json = new JSONObject();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+        int tagId = Integer.parseInt(request.getParameter("TagId"));
+        int maleMax = Integer.parseInt(request.getParameter("MaleNum"));
+        int femaleMax = Integer.parseInt(request.getParameter("FemaleNum"));
+        String content = request.getParameter("DateDesc");
+        String res = SensitiveWordTree.censorWords(content);
+        if (!res.equals("未匹配到敏感词")) {
+            json.put("type", "illegal");
+            return json;
+        } else json.put("type", "success");
+        String[] imgs = request.getParameterValues("DateImgs");
+        JSONArray temp = JSONArray.fromObject(imgs[0]);
+        String loc = request.getParameter("Location");
+        JSONObject location = JSONObject.fromObject(loc);
+
+        User user = userService.findById(userId);
+        Tag tag = tagService.findById(tagId);
+        Dating dating = new Dating();
+        dating.setContent(content);
+        dating.setHost(user);
+        dating.setTime(new Date());
+        dating.setMaxFemale(femaleMax);
+        dating.setMaxMale(maleMax);
+        dating.setTag(tag);
+        dating.setLocationName(location.get("Name").toString());
+        dating.setLatitude(Float.parseFloat(location.get("Latitude").toString()));
+        dating.setLongitude(Float.parseFloat(location.get("Longitude").toString()));
+        for (int i = 0; i < temp.size(); i++) {
+            dating.getImgsSet().add(temp.get(i).toString());
+        }
+        datingService.save(dating);
+        return json;
+    }
+
+    @RequestMapping(path = "/getDates")
+    public JSONArray getDates(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONArray array = new JSONArray();
+        Boolean isAvailable = Boolean.parseBoolean(request.getParameter("HasChooseSeat"));
+        int sortTag = Integer.parseInt(request.getParameter("TagId"));
+
+        List<Dating> datings = new ArrayList<Dating>();
+        if (sortTag == 0)
+            datings = datingService.getAll();
+        else {
+            datings = datingService.getDatingsByTag(sortTag);
+        }
+        if (isAvailable == false) {
+            for (Dating dating : datings) {
+                JSONObject json = new JSONObject();
+                json.put("DateId", dating.getId());
+                json.put("TagId", dating.getTag().getId());
+                json.put("TagName", dating.getTag().getContent());
+                json.put("DateDesc", dating.getContent());
+                json.put("DateTime", dating.getTime().getTime());
+                array.add(json);
+            }
+        } else {
+            for (Dating dating : datings) {
+                //check if available
+                if (dating.getParticipants().size() >= dating.getMaxFemale() + dating.getMaxMale())
+                    continue;
+                JSONObject json = new JSONObject();
+                json.put("DateId", dating.getId());
+                json.put("TagId", dating.getTag().getId());
+                json.put("TagName", dating.getTag().getContent());
+                json.put("DateDesc", dating.getContent());
+                json.put("DateTime", dating.getTime().getTime());
+                array.add(json);
+            }
+        }
+        return array;
+    }
+
+    @RequestMapping(path = "/myDates")
+    public JSONArray getMyDates(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONArray array = new JSONArray();
+
+
+        return array;
     }
 }

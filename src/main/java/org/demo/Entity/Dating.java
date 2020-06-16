@@ -17,6 +17,12 @@ public class Dating {
 
     private String content;
 
+    private String locationName;
+
+    private float latitude;
+
+    private float longitude;
+
     @ElementCollection(fetch = FetchType.EAGER, targetClass = String.class)
     private Set<String> imgs = new HashSet<String>();        //imgURL
 
@@ -28,7 +34,7 @@ public class Dating {
     @JoinTable(name = "t_participant_user", joinColumns = @JoinColumn(name = "dating_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> participants = new HashSet<User>();
 
-    @ManyToOne(fetch = FetchType.LAZY)      // dating tag
+    @ManyToOne(fetch = FetchType.EAGER)      // dating tag
     @JoinColumn
     private Tag tag;
 
@@ -67,6 +73,30 @@ public class Dating {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public float getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
+    }
+
+    public float getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
     }
 
     public List<String> getImgs() {
@@ -117,4 +147,5 @@ public class Dating {
     public void setMaxFemale(int maxFemale) {
         this.maxFemale = maxFemale;
     }
+
 }

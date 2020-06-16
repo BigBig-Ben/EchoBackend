@@ -1,7 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="57218601-2186-4fcf-a508-667e539b0eb9" name="Default Changelist" comment="" />
+    <list default="true" id="57218601-2186-4fcf-a508-667e539b0eb9" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Controller/APIController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Controller/APIController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Controller/IndexController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Controller/IndexController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/DAO/DatingDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/DAO/DatingDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/DAO/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/DAO/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Comment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Comment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Dating.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Dating.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Voice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Voice.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/service/DatingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/service/DatingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/service/TagService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/service/TagService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/service/VoiceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/service/VoiceService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Controller/APIController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Controller/APIController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Controller/IndexController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Controller/IndexController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/DAO/DatingDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/DAO/DatingDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/DAO/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/DAO/UserDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Entity/Comment.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Entity/Comment.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Entity/Dating.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Entity/Dating.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Entity/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Entity/Voice.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Entity/Voice.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/service/DatingService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/service/DatingService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/service/TagService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/service/TagService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/service/UserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/service/VoiceService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/service/VoiceService.class" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,13 +58,18 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1d1L009CCsfneeyF28bUDJItBl9" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="DatabaseDriversLRU" value="mysql" />
     <property name="RequestMappingsPanelOrder0" value="0" />
     <property name="RequestMappingsPanelOrder1" value="1" />
     <property name="RequestMappingsPanelWidth0" value="75" />
     <property name="RequestMappingsPanelWidth1" value="75" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="ignore.virus.scanning.warn.message" value="true" />
@@ -88,11 +121,22 @@
       <workItem from="1591779226354" duration="2000" />
       <workItem from="1591779409872" duration="4484000" />
       <workItem from="1592227569480" duration="10097000" />
-      <workItem from="1592273305287" duration="937000" />
+      <workItem from="1592273305287" duration="28985000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

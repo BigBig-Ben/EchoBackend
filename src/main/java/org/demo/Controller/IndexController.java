@@ -35,33 +35,5 @@ public class IndexController {
 	{
 		return "your input content is " + key + " values " + value;
 	}
-	
-	//{"xx":[{"a":a, "b":b },{"a":a, "b":b }...]
-	@RequestMapping("test1")
-	public JSONObject test1()
-	{
-		//System.out.println("1===");
-		JSONObject obj=new JSONObject();
-		JSONArray array=new JSONArray();
-		for(int i=0; i<3; i++)
-		{
-			JSONObject json=new JSONObject();
-			json.put("1st", "001");
-			json.put("2nd", "002");
-			json.put("3rd", "003");
-			array.add(json);
-		}
-		//System.out.println("2===");
-		obj.put("examples", array);
-		//System.out.println(obj.toString());
-		return obj;
-	}
-	
-	@RequestMapping("queryTest")
-	public String testForQuery()
-	{
-		System.out.println("===>"+userService.findById(1));
-		List<User> user = userService.test(1);
-		return "query ok"+user.toString();
-	}
+
 }

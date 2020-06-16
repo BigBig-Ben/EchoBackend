@@ -35,8 +35,7 @@ public class Voice {    //the first layer
     @OneToMany(mappedBy = "belong", fetch = FetchType.EAGER)
     private Set<Comment> comments = new HashSet<Comment>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "t_voice_like", joinColumns = @JoinColumn(name="voice_id"),inverseJoinColumns = @JoinColumn(name="user_id"))
+    @ManyToMany(mappedBy = "likeVoices", fetch = FetchType.EAGER)
     private Set<User> whoLikes = new HashSet<User>();
 
     public void starsInc() {

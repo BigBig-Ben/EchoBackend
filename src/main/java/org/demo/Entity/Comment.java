@@ -31,14 +31,13 @@ public class Comment {	//the second layer
 	@JoinColumn
 	private User host;		//评论归属用户
 	
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn
 	private Voice belong;	//评论归属留言
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "t_comment_like", joinColumns = @JoinColumn(name="comment_id"),inverseJoinColumns = @JoinColumn(name="user_id"))
+	@ManyToMany(mappedBy = "likeComments", fetch = FetchType.EAGER)
 	private Set<User> whoLikes = new HashSet<User>();
-	
+
 	public void starsInc()
 	{
 		stars++;

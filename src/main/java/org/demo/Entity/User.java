@@ -7,133 +7,132 @@ import javax.persistence.*;
 
 @Entity
 public class User {
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int id;
-	
-	private String openId;	//小程序用户id
-	
-	private String icon;	//img-url
-	
-	private String description;
-		
-	private int gender;		//0-female 1-male 2-unknown
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-	//voice
-	@OneToMany(mappedBy="host", fetch=FetchType.EAGER)	//user owns a msg voice
-	private Set<Voice> voices = new HashSet<Voice>();
+    private String openId;    //小程序用户id
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "t_voice_like", joinColumns = @JoinColumn(name="user_id"),inverseJoinColumns = @JoinColumn(name="voice_id"))
-	private Set<Voice> likeVoices = new HashSet<Voice>();
+    private String icon;    //img-url
 
-	//comment
-	@OneToMany(mappedBy="commented")	//user be commented
-	private Set<Comment> beComments = new HashSet<Comment>();
+    private String description;
 
-	@OneToMany(mappedBy="host")	//user owns a msg Comment
-	private Set<Comment> comments = new HashSet<Comment>();
+    private int gender;        //0-female 1-male 2-unknown
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "t_comment_like", joinColumns = @JoinColumn(name="user_id"),inverseJoinColumns = @JoinColumn(name="comment_id"))
-	private Set<Comment> likeComments = new HashSet<Comment>();
+    //voice
+    @OneToMany(mappedBy = "host", fetch = FetchType.EAGER)    //user owns a msg voice
+    private Set<Voice> voices = new HashSet<Voice>();
 
-	//dating
-	@OneToMany(mappedBy="host", fetch=FetchType.EAGER)	//user owns a msg voice
-	private Set<Dating> datings = new HashSet<Dating>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "t_voice_like", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "voice_id"))
+    private Set<Voice> likeVoices = new HashSet<Voice>();
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "t_participant_user", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "dating_id"))
-	private Set<Dating> participants = new HashSet<Dating>();
+    //comment
+    @OneToMany(mappedBy = "commented")    //user be commented
+    private Set<Comment> beComments = new HashSet<Comment>();
 
-	//date comment
-	@OneToMany(mappedBy="dateCommented")	//user be commented in dating
-	private Set<DateComment> beDateComments = new HashSet<DateComment>();
+    @OneToMany(mappedBy = "host", fetch = FetchType.EAGER)    //user owns a msg Comment
+    private Set<Comment> comments = new HashSet<Comment>();
 
-	@OneToMany(mappedBy="host")	//user owns a msg Comment in dating
-	private Set<DateComment> dateComments = new HashSet<DateComment>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "t_comment_like", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    private Set<Comment> likeComments = new HashSet<Comment>();
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", openId=" + openId + ", icon=" + icon + ", description=" + description + ", gender="
-				+ gender + ", beComments=" + beComments + "]";
-	}
+    //dating
+    @OneToMany(mappedBy = "host", fetch = FetchType.EAGER)    //user owns a msg voice
+    private Set<Dating> hostDatings = new HashSet<Dating>();
 
-	public int getId() {
-		return id;
-	}
+    @ManyToMany(mappedBy = "participants", fetch = FetchType.EAGER)
+    private Set<Dating> participatedDatings = new HashSet<Dating>();
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    //date comment
+    @OneToMany(mappedBy = "dateCommented")    //user be commented in dating
+    private Set<DateComment> beDateComments = new HashSet<DateComment>();
 
-	public String getOpenId() {
-		return openId;
-	}
+    @OneToMany(mappedBy = "host", fetch = FetchType.EAGER)    //user owns a msg Comment in dating
+    private Set<DateComment> dateComments = new HashSet<DateComment>();
 
-	public void setOpenId(String openId) {
-		this.openId = openId;
-	}
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", openId=" + openId + ", icon=" + icon + ", description=" + description + ", gender="
+                + gender + ", beComments=" + beComments + "]";
+    }
 
-	public String getIcon() {
-		return icon;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getOpenId() {
+        return openId;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setOpenId(String openId) {
+        this.openId = openId;
+    }
 
-	public int getGender() {
-		return gender;
-	}
+    public String getIcon() {
+        return icon;
+    }
 
-	public void setGender(int gender) {
-		this.gender = gender;
-	}
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
 
-	public Set<Voice> getVoices() {
-		return voices;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public Set<Comment> getBeComments() {
-		return beComments;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public Set<Comment> getComments() {
-		return comments;
-	}
+    public int getGender() {
+        return gender;
+    }
 
-	public Set<Dating> getDatings() {
-		return datings;
-	}
+    public void setGender(int gender) {
+        this.gender = gender;
+    }
 
-	public Set<Dating> getParticipants() {
-		return participants;
-	}
+    public Set<Voice> getVoices() {
+        return voices;
+    }
 
-	public Set<DateComment> getBeDateComments() {
-		return beDateComments;
-	}
+    public Set<Comment> getBeComments() {
+        return beComments;
+    }
 
-	public Set<DateComment> getDateComments() {
-		return dateComments;
-	}
+    public Set<Comment> getComments() {
+        return comments;
+    }
 
-	public Set<Voice> getLikeVoices() {
-		return likeVoices;
-	}
+    public Set<Dating> getHostDatings() {
+        return hostDatings;
+    }
 
-	public Set<Comment> getLikeComments() {
-		return likeComments;
-	}
+    public Set<Dating> getParticipatedDatings() {
+        return participatedDatings;
+    }
+
+    public Set<DateComment> getBeDateComments() {
+        return beDateComments;
+    }
+
+    public Set<DateComment> getDateComments() {
+        return dateComments;
+    }
+
+    public Set<Voice> getLikeVoices() {
+        return likeVoices;
+    }
+
+    public Set<Comment> getLikeComments() {
+        return likeComments;
+    }
 /*@ManyToMany(cascade=CascadeType.PERSIST)	//user map a piece of comment
 	@JoinTable(name="t_comment_user", joinColumns=@JoinColumn(name="user_id"), inverseJoinColumns=@JoinColumn(name="comment_id"))
 	private Set<Comment> myComments= new HashSet<Comment>();*/
