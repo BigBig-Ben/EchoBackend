@@ -8,6 +8,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.stream.events.DTD;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.demo.Entity.*;
@@ -337,6 +338,7 @@ public class APIController {
         Dating dating = new Dating();
         dating.setContent(content);
         dating.setHost(user);
+        dating.getParticipants().add(user);
         dating.setTime(new Date());
         dating.setMaxFemale(femaleMax);
         dating.setMaxMale(maleMax);
@@ -390,11 +392,104 @@ public class APIController {
         return array;
     }
 
-    @RequestMapping(path = "/myDates")
+    @RequestMapping(path = "/myDates")  //untest
     public JSONArray getMyDates(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONArray array = new JSONArray();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
 
-
+        User user = userService.findById(userId);
+        List<Dating> myDatings = new ArrayList<Dating>(user.getParticipatedDatings());
+        for (Dating dating : myDatings) {
+            JSONObject json = new JSONObject();
+            json.put("DateId", dating.getId());
+            json.put("TagId", dating.getTag().getId());
+            json.put("TagName", dating.getTag().getContent());
+            json.put("DateDesc", dating.getContent());
+            json.put("DateTime", dating.getTime().getTime());
+            array.add(json);
+        }
         return array;
     }
+
+    @RequestMapping(path = "/getOneDate")
+    public JSONObject getOneDate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONObject res = new JSONObject();
+        int dateId = Integer.parseInt(request.getParameter("DateId"));
+
+        Dating dating = datingService.getDatingById(dateId);
+        List<User> users = new ArrayList<User>(dating.getParticipants());
+        JSONArray participants = new JSONArray();
+        for (User user : users) {
+            JSONObject json = new JSONObject();
+            json.put("UserId", user.getId());
+            json.put("UserIcon", user.getIcon());
+            json.put("UserGender", user.getGender());
+            participants.add(json);
+        }
+        res.put("Users", participants);
+        JSONObject jsonDating = new JSONObject();
+        jsonDating.put("DateDesc", dating.getContent());
+        jsonDating.put("DateImgs", dating.getImgs());
+        jsonDating.put("DateTime", dating.getTime().getTime());
+        jsonDating.put("MaleNum", dating.getMaxMale());
+        jsonDating.put("FemaleNum", dating.getMaxFemale());
+        jsonDating.put("DateHost", dating.getHost().getId());
+        JSONObject loc = new JSONObject();
+        loc.put("Name", dating.getLocationName());
+        loc.put("Latitude", dating.getLatitude());
+        loc.put("Longitude", dating.getLongitude());
+        jsonDating.put("Location", loc);
+        res.put("Date", jsonDating);
+        return res;
+    }
+
+    @RequestMapping(path = "/joinDate") //untest
+    public JSONObject participateDate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONObject json = new JSONObject();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+        int datingId = Integer.parseInt(request.getParameter("DateId"));
+
+        User user = userService.findById(userId);
+        Dating dating = datingService.getDatingById(datingId);
+        List<User> participants = new ArrayList<User>(dating.getParticipants());
+        int hasJoinedFemale = 0;
+        int hasJoinedMale = 0;
+        for (User one : participants) {
+            if (one.getGender() == 0)
+                hasJoinedFemale++;
+            else if (one.getGender() == 1)
+                hasJoinedMale++;
+        }
+        if (user.getGender() == 0) {
+            //female
+            if (hasJoinedFemale < dating.getMaxFemale()) {
+                dating.getParticipants().add(user);
+                datingService.update(dating);
+            } else {
+                json.put("msg", "seat for female is not available");
+                return json;
+            }
+        } else if (user.getGender() == 1) {
+            //male
+            if (hasJoinedMale < dating.getMaxMale()) {
+                dating.getParticipants().add(user);
+                datingService.update(dating);
+            } else {
+                json.put("msg", "seat for male is not available");
+                return json;
+            }
+        } else {
+            //unknown
+            if (dating.getParticipants().size() < dating.getMaxMale() + dating.getMaxFemale()) {
+                dating.getParticipants().add(user);
+                datingService.update(dating);
+            } else {
+                json.put("msg", "no seat is available");
+                return json;
+            }
+        }
+        json.put("msg", "success");
+        return json;
+    }
+
 }
