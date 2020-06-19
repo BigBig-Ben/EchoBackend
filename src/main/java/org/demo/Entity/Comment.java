@@ -18,14 +18,15 @@ public class Comment {	//the second layer
 	private String content;
 	
 	private Date time;
-	
-	private int stars; 		//点赞
-	
+
 	private int type;		//type 0:comment 1:reply
-	
+
+    // 展示废置，后期该提示时使用
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn
 	private User commented;
+
+	private int commentedFloor;
 	
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn
@@ -38,20 +39,10 @@ public class Comment {	//the second layer
 	@ManyToMany(mappedBy = "likeComments", fetch = FetchType.EAGER)
 	private Set<User> whoLikes = new HashSet<User>();
 
-	public void starsInc()
-	{
-		stars++;
-	}
-	
-	public void starsDec()
-	{
-		stars--;
-	}
-	
 
 	@Override
 	public String toString() {
-		return "{id=" + id + ", floor=" + floor + ", content=" + content + ", time=" + time + ", stars=" + stars
+		return "{id=" + id + ", floor=" + floor + ", content=" + content + ", time=" + time
 				+ ", type=" + type + ", commented=" + commented + ", host=" + host + ", belong=" + belong + "}";
 	}
 
@@ -91,14 +82,6 @@ public class Comment {	//the second layer
 		this.time = time;
 	}
 
-	public int getStars() {
-		return stars;
-	}
-
-	public void setStars(int stars) {
-		this.stars = stars;
-	}
-
 	public int getType() {
 		return type;
 	}
@@ -107,15 +90,15 @@ public class Comment {	//the second layer
 		this.type = type;
 	}
 
-	public User getCommented() {
-		return commented;
-	}
+    public int getCommentedFloor() {
+        return commentedFloor;
+    }
 
-	public void setCommented(User commented) {
-		this.commented = commented;
-	}
+    public void setCommentedFloor(int commentedFloor) {
+        this.commentedFloor = commentedFloor;
+    }
 
-	public User getHost() {
+    public User getHost() {
 		return host;
 	}
 

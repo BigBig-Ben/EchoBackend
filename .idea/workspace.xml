@@ -2,30 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="57218601-2186-4fcf-a508-667e539b0eb9" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/demo/DAO/DateDiscussionDAO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Controller/APIController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Controller/APIController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Controller/WeChatLogin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Controller/WeChatLogin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/DAO/DateCommentDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/DAO/DatingDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/DAO/DatingDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/DAO/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/DAO/UserDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/EchoApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/EchoApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Entity/DateComment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Entity/DateDiscussion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Dating.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Dating.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/DAO/CommentDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/DAO/CommentDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/DAO/VoiceDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/DAO/VoiceDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Comment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Comment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/service/DateCommentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/service/DateDiscussionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/service/DatingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/service/DatingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Voice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/Entity/Voice.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/demo/service/CommentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/demo/service/CommentService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Controller/APIController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Controller/APIController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Controller/WeChatLogin.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Controller/WeChatLogin.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/DAO/DateCommentDAO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/DAO/DatingDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/DAO/DatingDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/DAO/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/DAO/UserDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/EchoApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/EchoApplication.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Entity/DateComment.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Entity/Dating.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Entity/Dating.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/DAO/CommentDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/DAO/CommentDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Entity/Comment.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Entity/Comment.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Entity/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/service/DateCommentService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/service/DatingService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/service/DatingService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/Entity/Voice.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/Entity/Voice.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/demo/service/CommentService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/demo/service/CommentService.class" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -122,7 +112,8 @@
       <workItem from="1592403651487" duration="6242000" />
       <workItem from="1592447205687" duration="2625000" />
       <workItem from="1592478497063" duration="4752000" />
-      <workItem from="1592529770555" duration="13611000" />
+      <workItem from="1592529770555" duration="19939000" />
+      <workItem from="1592573529264" duration="4726000" />
     </task>
     <servers />
   </component>

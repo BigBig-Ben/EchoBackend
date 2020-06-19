@@ -38,14 +38,6 @@ public class Voice {    //the first layer
     @ManyToMany(mappedBy = "likeVoices", fetch = FetchType.EAGER)
     private Set<User> whoLikes = new HashSet<User>();
 
-    public void starsInc() {
-        stars++;
-    }
-
-    public void starsDec() {
-        stars--;
-    }
-
     @Override
     public String toString() {
         return "{id=" + id + ", time=" + time + ", content=" + content + ", stars=" + stars + ", imgs=" + imgs

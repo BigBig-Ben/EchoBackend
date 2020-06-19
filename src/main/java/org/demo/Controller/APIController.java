@@ -88,15 +88,22 @@ public class APIController {
         Voice voice = voiceService.getVoiceById(voiceId);
         User user = userService.findById(userId);
 
+        json.put("Name", getRandomName());
         json.put("VoiceID", voice.getId());
         json.put("VoiceIcon", user.getIcon());
         json.put("VoiceDesc", voice.getContent());
         json.put("VoiceImgs", voice.getImgs());
         json.put("VoiceLike", voice.getWhoLikes().size());
-        //obj.put("VoiceTime", format1.format(voice.getTime().getTime()));
         json.put("Time", voice.getTime().getTime());
+        boolean flag = false;
         Set<Voice> likedVoices = user.getLikeVoices();
-        if (likedVoices.contains(voice))
+        for (Voice v : likedVoices) {
+            if (v.getId() == voice.getId()) {
+                flag = true;
+                break;
+            }
+        }
+        if (flag)
             json.put("VoiceHasLiked", Boolean.TRUE);
         else json.put("VoiceHasLiked", Boolean.FALSE);
         return json;
@@ -107,27 +114,32 @@ public class APIController {
         JSONArray array = new JSONArray();
         int voiceId = Integer.parseInt(request.getParameter("VoiceId"));
         int userId = Integer.parseInt(request.getParameter("UserId"));
-        Voice voice = voiceService.getVoiceById(voiceId);
         User user = userService.findById(userId);
 
-        List<Comment> comments = new ArrayList<Comment>(voice.getComments());
-        Collections.reverse(comments);
+        List<Comment> comments = new ArrayList<Comment>(commentService.getCommentsByVoiceId(voiceId));
+        Set<Comment> likedComments = user.getLikeComments();
         for (Comment comment : comments) {
             JSONObject json = new JSONObject();
+            json.put("Name", getRandomName());
             json.put("UserId", comment.getHost().getId());
             json.put("CommentID", comment.getId());
             json.put("CommentIcon", comment.getHost().getIcon());
-            json.put("CommentType", comment.getType());
+            if(comment.getType() == 0)
+                json.put("CommentType", "REPLY");
+            else json.put("CommentType", "COMMENT");
             json.put("CommentDesc", comment.getContent());
             json.put("CommentLike", comment.getWhoLikes().size());
-            //if(c.getType() == 0)
-            //temp.put("CommentedUserID", c.getCommented().getId());
+            json.put("Floor", comment.getFloor());
             json.put("Time", comment.getTime().getTime());
-            //temp.put("CommentTime", format1.format(c.getTime()));
-            json.put("CommentedNo", comment.getFloor());
-
-            Set<Comment> likedComments = user.getComments();
-            if (likedComments.contains(comment))
+            json.put("CommentedFloor", comment.getCommentedFloor());
+            boolean flag = false;
+            for (Comment c: likedComments) {
+                if (c.getId() == comment.getId()) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag)
                 json.put("CommentHasLiked", Boolean.TRUE);
             else json.put("CommentHasLiked", Boolean.FALSE);
             array.add(json);
@@ -139,6 +151,10 @@ public class APIController {
     public JSONArray getSquareVoice(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONArray array = new JSONArray();
         String sortType = request.getParameter("SquareSort");
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+
+        User user = userService.findById(userId);
+        Set<Voice> likedVoices = user.getLikeVoices();
         List<Voice> voices = new ArrayList<Voice>();
         if (sortType.equals("HOT")) {
             voices = voiceService.findOrderByStarsDesc();
@@ -147,18 +163,30 @@ public class APIController {
         }
         //voices = voiceService.getAll();
         for (Voice voice : voices) {
-            JSONObject temp = new JSONObject();
-            temp.put("VoiceId", voice.getId());
-            temp.put("VoiceIcon", voice.getHost().getIcon());
-            temp.put("VoiceDesc", voice.getContent());
+            JSONObject json = new JSONObject();
+            json.put("Name", getRandomName());
+            json.put("VoiceId", voice.getId());
+            json.put("VoiceIcon", voice.getHost().getIcon());
+            json.put("VoiceDesc", voice.getContent());
             List<String> imgs = voice.getImgs();
             String[] imgsss = imgs.toArray(new String[imgs.size()]);
-            temp.put("VoiceImgs", imgsss);
-            temp.put("VoiceLike", voice.getWhoLikes().size());
-            //temp.put("VoiceTime", format1.format(v.getTime().getTime()));
-            temp.put("Time", voice.getTime().getTime());
-            temp.put("CommentCnt", voice.getComments().size());
-            array.add(temp);
+            json.put("VoiceImgs", imgsss);
+            json.put("VoiceLike", voice.getWhoLikes().size());
+            json.put("Time", voice.getTime().getTime());
+            json.put("CommentCnt", voice.getComments().size());
+
+            boolean flag = false;
+            for (Voice v : likedVoices) {
+                if (v.getId() == voice.getId()) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag)
+                json.put("HasLike", Boolean.TRUE);
+            else json.put("HasLike", Boolean.FALSE);
+
+            array.add(json);
         }
         return array;
     }
@@ -181,8 +209,8 @@ public class APIController {
         Voice voice = new Voice();
         voice.setContent(content);
         voice.setHost(user);
-        voice.setTime(new Date());
         voice.setStars(0);
+        voice.setTime(new Date());
         for (int i = 0; i < temp.size(); i++) {
             System.out.println(temp.get(i));
             voice.getImgsSet().add(temp.get(i).toString());
@@ -217,34 +245,32 @@ public class APIController {
         JSONObject json = new JSONObject();
         Comment comment = new Comment();
         int userid = Integer.parseInt(request.getParameter("UserId"));
-        User user = userService.findById(userid);
-        comment.setHost(user);
         int voiceBelongId = Integer.parseInt(request.getParameter("VoiceBelong"));
-        Voice voice = voiceService.getVoiceById(voiceBelongId);
-        comment.setBelong(voice);
         String type = request.getParameter("CommentType");
-        if (type.equals("REPLY")) {
-            int commentedUserId = Integer.parseInt(request.getParameter("CommentedUserID"));
-            user = userService.findById(commentedUserId);
-            comment.setCommented(user);
-            comment.setType(0);
-        } else
-            comment.setType(1);
         String content = request.getParameter("CommentDesc");
+        int floor = Integer.parseInt(request.getParameter("CommentNo"));
+
         String res = SensitiveWordTree.censorWords(content);
         if (!res.equals("未匹配到敏感词")) {
             json.put("type", "illegal");
             return json;
         } else json.put("type", "success");
+        User user = userService.findById(userid);
+        Voice voice = voiceService.getVoiceById(voiceBelongId);
+
+        if (type.equals("REPLY")) {
+            int commentedFloor = Integer.parseInt(request.getParameter("CommentedFloor"));
+            comment.setCommentedFloor(commentedFloor);
+            comment.setType(0);
+        } else
+            comment.setType(1);
+
+        comment.setHost(user);
+        comment.setBelong(voice);
         comment.setContent(content);
-        comment.setStars(0);
-        Date time = new Date();
-        comment.setTime(time);
-        int floor = Integer.parseInt(request.getParameter("CommentNo"));
+        comment.setTime(new Date());
         comment.setFloor(floor);
-        //楼号保存
         commentService.save(comment);
-        //json.put("time", time);
         return json;
     }
 
@@ -261,21 +287,17 @@ public class APIController {
         if (type.equals("like")) {
             // like
             userService.likeVoice(userId, voiceId);
-            voice.starsInc();
-            System.out.println("like");
         } else {
             // dislike
             userService.dislikeVoice(userId, voiceId);
-            voice.starsDec();
-            System.out.println("dislike");
         }
+        voice.setStars(voice.getWhoLikes().size());
         voiceService.update(voice);
         return json;
     }
 
     @RequestMapping(path = "/CommentLike")
     public JSONObject commentLike(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("comment like start");
         JSONObject json = new JSONObject();
         int commentId = Integer.parseInt(request.getParameter("CommentId"));
         int userId = Integer.parseInt(request.getParameter("UserId"));
@@ -285,11 +307,11 @@ public class APIController {
         User user = userService.findById(userId);
 
         if (type.equals("like")) {
+            // like
             userService.likeComment(userId, commentId);
-            comment.starsInc();
         } else {
+            // dislike
             userService.dislikeComment(userId, commentId);
-            comment.starsDec();
         }
         commentService.update(comment);
         return json;

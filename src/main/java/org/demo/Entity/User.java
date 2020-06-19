@@ -28,7 +28,7 @@ public class User {
     private Set<Voice> likeVoices = new HashSet<Voice>();
 
     //comment
-    @OneToMany(mappedBy = "commented")    //user be commented
+    @OneToMany(mappedBy = "commented", fetch = FetchType.EAGER)    //user be commented
     private Set<Comment> beComments = new HashSet<Comment>();
 
     @OneToMany(mappedBy = "host", fetch = FetchType.EAGER)    //user owns a msg Comment
