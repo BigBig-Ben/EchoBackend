@@ -1,12 +1,10 @@
 package org.demo.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.demo.DAO.VoiceDAO;
 import org.demo.Entity.Voice;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +32,9 @@ public class VoiceService {
 	}
 
 	@Transactional
-	public List<Voice> getAll()
+	public List<Voice> getVoicesByUserId(int userId)
 	{
-		return (List<Voice>) voiceDAO.findAll();
+		return (List<Voice>) voiceDAO.getVoicesByUserId(userId);
 	}
 
 	@Transactional
@@ -46,15 +44,15 @@ public class VoiceService {
 	}
 
 	@Transactional
-	public List<Voice> findOrderByStarsDesc()
+	public List<Voice> getVoicesOrderByStarsDesc()
 	{
-		return voiceDAO.findOrderByStarsDesc();
+		return voiceDAO.getVoicesOrderByStarsDesc();
 	}
 
 	@Transactional
-	public List<Voice> findOrderByTimeDesc()
+	public List<Voice> getVoicesOrderByTimeDesc()
 	{
-		return voiceDAO.findOrderByTimeDesc();
+		return voiceDAO.getVoicesOrderByTimeDesc();
 	}
 	
 }

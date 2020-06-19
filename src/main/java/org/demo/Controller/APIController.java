@@ -3,11 +3,9 @@ package org.demo.Controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.demo.Entity.*;
 import org.demo.service.*;
 import org.demo.util.SensitiveWordTree;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -42,7 +39,7 @@ public class APIController {
     @Autowired
     private DateDiscussionService dateDiscussionService;
 
-    SimpleDateFormat format1 = new SimpleDateFormat("MM月dd日 HH时mm分");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MM月dd日 HH时mm分");
 
     @RequestMapping(path = "/getUserInfo")
     public JSONObject getUserInfo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -60,19 +57,19 @@ public class APIController {
     @RequestMapping(path = "/getUserVoices")
     public JSONObject getUserVoices(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONObject json = new JSONObject();
-        int id = Integer.parseInt(request.getParameter("UserId"));
-        User user = userService.findById(id);
-        String icon = user.getIcon();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+
+        User user = userService.findById(userId);
         JSONArray array = new JSONArray();
-        List<Voice> voices = new ArrayList<Voice>(user.getVoices());
+        List<Voice> voices = new ArrayList<Voice>(voiceService.getVoicesByUserId(userId));
         for (Voice voice : voices) {
             JSONObject temp = new JSONObject();
             temp.put("VoiceId", voice.getId());
-            temp.put("VoiceIcon", icon);
+            temp.put("VoiceIcon", user.getIcon());
             temp.put("VoiceDesc", voice.getContent());
             temp.put("VoiceImgs", voice.getImgs());
             temp.put("VoiceLike", voice.getWhoLikes().size());
-            //temp.put("VoiceTime", format1.format(v.getTime().getTime()));
+            temp.put("TagStr", voice.getTags());
             temp.put("Time", voice.getTime().getTime());
             array.add(temp);
         }
@@ -95,6 +92,7 @@ public class APIController {
         json.put("VoiceImgs", voice.getImgs());
         json.put("VoiceLike", voice.getWhoLikes().size());
         json.put("Time", voice.getTime().getTime());
+        json.put("TagStr", voice.getTags());
         boolean flag = false;
         Set<Voice> likedVoices = user.getLikeVoices();
         for (Voice v : likedVoices) {
@@ -124,7 +122,7 @@ public class APIController {
             json.put("UserId", comment.getHost().getId());
             json.put("CommentID", comment.getId());
             json.put("CommentIcon", comment.getHost().getIcon());
-            if(comment.getType() == 0)
+            if (comment.getType() == 0)
                 json.put("CommentType", "REPLY");
             else json.put("CommentType", "COMMENT");
             json.put("CommentDesc", comment.getContent());
@@ -133,7 +131,7 @@ public class APIController {
             json.put("Time", comment.getTime().getTime());
             json.put("CommentedFloor", comment.getCommentedFloor());
             boolean flag = false;
-            for (Comment c: likedComments) {
+            for (Comment c : likedComments) {
                 if (c.getId() == comment.getId()) {
                     flag = true;
                     break;
@@ -157,9 +155,9 @@ public class APIController {
         Set<Voice> likedVoices = user.getLikeVoices();
         List<Voice> voices = new ArrayList<Voice>();
         if (sortType.equals("HOT")) {
-            voices = voiceService.findOrderByStarsDesc();
+            voices = voiceService.getVoicesOrderByStarsDesc();
         } else {
-            voices = voiceService.findOrderByTimeDesc();
+            voices = voiceService.getVoicesOrderByTimeDesc();
         }
         //voices = voiceService.getAll();
         for (Voice voice : voices) {
@@ -174,6 +172,7 @@ public class APIController {
             json.put("VoiceLike", voice.getWhoLikes().size());
             json.put("Time", voice.getTime().getTime());
             json.put("CommentCnt", voice.getComments().size());
+            json.put("TagStr", voice.getTags());
 
             boolean flag = false;
             for (Voice v : likedVoices) {
@@ -198,7 +197,8 @@ public class APIController {
         int userId = Integer.parseInt(request.getParameter("UserId"));
         String content = request.getParameter("VoiceDesc");
         String res = SensitiveWordTree.censorWords(content);
-        System.out.println("sensitive tree res: " + res);
+        String tags = request.getParameter("TagStr");
+
         if (!res.equals("未匹配到敏感词")) {
             json.put("type", "illegal");
             return json;
@@ -211,6 +211,7 @@ public class APIController {
         voice.setHost(user);
         voice.setStars(0);
         voice.setTime(new Date());
+        voice.setTags(tags);
         for (int i = 0; i < temp.size(); i++) {
             System.out.println(temp.get(i));
             voice.getImgsSet().add(temp.get(i).toString());
@@ -222,20 +223,19 @@ public class APIController {
     @RequestMapping(path = "/addUser", method = RequestMethod.POST)
     public JSONObject addUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONObject json = new JSONObject();
-        String userid = request.getParameter("UserId");
-        int userId = Integer.parseInt(userid);
-        //String icon=request.getParameter("icon");
+        int userId = Integer.parseInt(request.getParameter("UserId"));
         String description = request.getParameter("description");
         int gender = Integer.parseInt(request.getParameter("gender"));
         User user = userService.findById(userId);
+
+        //TODO
         if (gender == 0)
-            user.setIcon("../imgs/girl.png");//gender decide
+            user.setIcon("../imgs/girl.png");   //gender decide
         else if (gender == 1)
             user.setIcon("../imgs/boy.png");
         else user.setIcon("../imgs/unknown.png");
         user.setDescription(description);
         user.setGender(gender);
-        //System.out.println("user save ok");
         userService.save(user);
         return json;
     }
@@ -624,5 +624,41 @@ public class APIController {
         return array;
     }
 
+    @RequestMapping(path = "/getIcons") //untest
+    public JSONArray getIcons(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONArray array = new JSONArray();
+        for (int i = 0; i < 60; i++) {
+            JSONObject json = new JSONObject();
+            json.put("Id", i);
+            json.put("URL", "http://3p233v4064.qicp.vip/images/icon/" + i + ".png");
+            array.add(json);
+        }
+        return array;
+    }
 
+    @RequestMapping(path = "/setIcon")  //untest
+    public JSONObject setIcon(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONObject json = new JSONObject();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+        String imgURL = request.getParameter("Icon");
+
+        User user = userService.findById(userId);
+        user.setIcon(imgURL);
+        userService.update(user);
+        json.put("msg", "success");
+        return json;
+    }
+
+    @RequestMapping(path = "/setBackground")    //untest
+    public JSONObject setBackground(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONObject json = new JSONObject();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+        String imgURL = request.getParameter("Background");
+
+        User user = userService.findById(userId);
+        user.setBackground(imgURL);
+        userService.update(user);
+        json.put("msg", "success");
+        return json;
+    }
 }

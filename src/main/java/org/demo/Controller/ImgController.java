@@ -33,7 +33,8 @@ public class ImgController {
             if (file.exists() == false)
                 file.createNewFile();
             multipartFile.transferTo(file);
-            imgName = "http://192.168.123.164:8080/images/" + file.getName();
+            imgName = "http://3p233v4064.qicp.vip/images/"+file.getName();
+            //imgName = "http://192.168.123.164:8080/images/" + file.getName();
             //System.out.println("real path: " + realPath);
             //System.out.println("image name: " + imgName);
         } catch (IOException e) {

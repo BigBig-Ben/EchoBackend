@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 /*
  * for test
@@ -27,7 +25,6 @@ public class IndexController {
 	@RequestMapping(value="/")
 	public String welcome()
 	{
-		
 		return "WELCOME this is index";
 	}
 	@RequestMapping(value="/test/{key}={value}")

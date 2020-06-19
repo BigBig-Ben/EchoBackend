@@ -11,13 +11,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String openId;    //小程序用户id
+    private String openId;      // 小程序用户id
 
-    private String icon;    //img-url
+    private String icon;        // img-url for icon
 
     private String description;
 
-    private int gender;        //0-female 1-male 2-unknown
+    private int gender;         // 0-female 1-male 2-unknown
+
+    private String background;  // background picture for "my" page
 
     //voice
     @OneToMany(mappedBy = "host", fetch = FetchType.EAGER)    //user owns a msg voice
@@ -93,6 +95,14 @@ public class User {
 
     public void setGender(int gender) {
         this.gender = gender;
+    }
+
+    public String getBackground() {
+        return background;
+    }
+
+    public void setBackground(String background) {
+        this.background = background;
     }
 
     public Set<Voice> getVoices() {
