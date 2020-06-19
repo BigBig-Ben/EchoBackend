@@ -14,7 +14,7 @@ public interface UserDAO extends CrudRepository<User,Integer>{
 	public List<User> checkOpenid(@Param("openid") String openid);
 
 	@Modifying
-	@Query(value = "delete from t_voice_like where user_id = :userId & voice_id = :voiceId", nativeQuery = true)
+	@Query(value = "delete from t_voice_like where user_id = :userId and voice_id = :voiceId", nativeQuery = true)
 	public void dislikeVoice(@Param("userId") int userId, @Param("voiceId") int voiceId);
 
 	@Modifying
@@ -22,7 +22,7 @@ public interface UserDAO extends CrudRepository<User,Integer>{
 	public void likeVoice(@Param("userId") int userId, @Param("voiceId") int voiceId);
 
 	@Modifying
-	@Query(value = "delete from t_comment_like where user_id = :userId & comment_id = :commentId", nativeQuery = true)
+	@Query(value = "delete from t_comment_like where user_id = :userId and comment_id = :commentId", nativeQuery = true)
 	public void dislikeComment(@Param("userId") int userId, @Param("commentId") int commentId);
 
 	@Modifying

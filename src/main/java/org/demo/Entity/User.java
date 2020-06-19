@@ -45,12 +45,9 @@ public class User {
     @ManyToMany(mappedBy = "participants", fetch = FetchType.EAGER)
     private Set<Dating> participatedDatings = new HashSet<Dating>();
 
-    //date comment
-    @OneToMany(mappedBy = "dateCommented")    //user be commented in dating
-    private Set<DateComment> beDateComments = new HashSet<DateComment>();
-
+    //date discussion
     @OneToMany(mappedBy = "host", fetch = FetchType.EAGER)    //user owns a msg Comment in dating
-    private Set<DateComment> dateComments = new HashSet<DateComment>();
+    private Set<DateDiscussion> dateDiscussions = new HashSet<DateDiscussion>();
 
     @Override
     public String toString() {
@@ -118,12 +115,8 @@ public class User {
         return participatedDatings;
     }
 
-    public Set<DateComment> getBeDateComments() {
-        return beDateComments;
-    }
-
-    public Set<DateComment> getDateComments() {
-        return dateComments;
+    public Set<DateDiscussion> getDateDiscussions() {
+        return dateDiscussions;
     }
 
     public Set<Voice> getLikeVoices() {
@@ -133,7 +126,5 @@ public class User {
     public Set<Comment> getLikeComments() {
         return likeComments;
     }
-/*@ManyToMany(cascade=CascadeType.PERSIST)	//user map a piece of comment
-	@JoinTable(name="t_comment_user", joinColumns=@JoinColumn(name="user_id"), inverseJoinColumns=@JoinColumn(name="comment_id"))
-	private Set<Comment> myComments= new HashSet<Comment>();*/
+
 }

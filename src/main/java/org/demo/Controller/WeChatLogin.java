@@ -25,8 +25,10 @@ import net.sf.json.JSONObject;
 public class WeChatLogin {
 
     private static final long serialVersionUID = 1L;
-    private static final String APPID = "wx9c67f71fc41e19eb";
-    private static final String SECRET = "8c56a861fa13ebca656564ac683b4607";
+    //private static final String APPID = "wx9c67f71fc41e19eb";
+    //private static final String SECRET = "8c56a861fa13ebca656564ac683b4607";
+    private static final String APPID = "wxd5cc140983f0aef6";
+    private static final String SECRET = "50216a427617d2d629a14304d11c5e0b";
     private String code;
 
     @Autowired

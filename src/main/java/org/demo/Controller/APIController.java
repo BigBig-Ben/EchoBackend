@@ -4,26 +4,22 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.stream.events.DTD;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.demo.Entity.*;
 import org.demo.service.*;
 import org.demo.util.SensitiveWordTree;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jackson.JsonObjectDeserializer;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import sun.misc.Perf;
+
+import static org.demo.EchoApplication.getRandomName;
 
 @RestController
 @RequestMapping(path = "/api")
@@ -44,7 +40,7 @@ public class APIController {
     private DatingService datingService;
 
     @Autowired
-    private DateCommentService dateCommentService;
+    private DateDiscussionService dateDiscussionService;
 
     SimpleDateFormat format1 = new SimpleDateFormat("MM月dd日 HH时mm分");
 
@@ -77,7 +73,7 @@ public class APIController {
             temp.put("VoiceImgs", voice.getImgs());
             temp.put("VoiceLike", voice.getWhoLikes().size());
             //temp.put("VoiceTime", format1.format(v.getTime().getTime()));
-            temp.put("VoiceTime", voice.getTime().getTime());
+            temp.put("Time", voice.getTime().getTime());
             array.add(temp);
         }
         json.put("Voices", array);
@@ -98,7 +94,7 @@ public class APIController {
         json.put("VoiceImgs", voice.getImgs());
         json.put("VoiceLike", voice.getWhoLikes().size());
         //obj.put("VoiceTime", format1.format(voice.getTime().getTime()));
-        json.put("VoiceTime", voice.getTime().getTime());
+        json.put("Time", voice.getTime().getTime());
         Set<Voice> likedVoices = user.getLikeVoices();
         if (likedVoices.contains(voice))
             json.put("VoiceHasLiked", Boolean.TRUE);
@@ -126,7 +122,7 @@ public class APIController {
             json.put("CommentLike", comment.getWhoLikes().size());
             //if(c.getType() == 0)
             //temp.put("CommentedUserID", c.getCommented().getId());
-            json.put("CommentTime", comment.getTime().getTime());
+            json.put("Time", comment.getTime().getTime());
             //temp.put("CommentTime", format1.format(c.getTime()));
             json.put("CommentedNo", comment.getFloor());
 
@@ -160,7 +156,7 @@ public class APIController {
             temp.put("VoiceImgs", imgsss);
             temp.put("VoiceLike", voice.getWhoLikes().size());
             //temp.put("VoiceTime", format1.format(v.getTime().getTime()));
-            temp.put("VoiceTime", voice.getTime().getTime());
+            temp.put("Time", voice.getTime().getTime());
             temp.put("CommentCnt", voice.getComments().size());
             array.add(temp);
         }
@@ -218,7 +214,6 @@ public class APIController {
 
     @RequestMapping(path = "/addComment")
     public JSONObject addComment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("add voice start");
         JSONObject json = new JSONObject();
         Comment comment = new Comment();
         int userid = Integer.parseInt(request.getParameter("UserId"));
@@ -361,7 +356,7 @@ public class APIController {
 
         List<Dating> datings = new ArrayList<Dating>();
         if (sortTag == 0)
-            datings = datingService.getAll();
+            datings = datingService.getAllDatings();
         else {
             datings = datingService.getDatingsByTag(sortTag);
         }
@@ -372,7 +367,7 @@ public class APIController {
                 json.put("TagId", dating.getTag().getId());
                 json.put("TagName", dating.getTag().getContent());
                 json.put("DateDesc", dating.getContent());
-                json.put("DateTime", dating.getTime().getTime());
+                json.put("Time", dating.getTime().getTime());
                 array.add(json);
             }
         } else {
@@ -385,28 +380,78 @@ public class APIController {
                 json.put("TagId", dating.getTag().getId());
                 json.put("TagName", dating.getTag().getContent());
                 json.put("DateDesc", dating.getContent());
-                json.put("DateTime", dating.getTime().getTime());
+                json.put("Time", dating.getTime().getTime());
                 array.add(json);
             }
         }
         return array;
     }
 
-    @RequestMapping(path = "/myDates")  //untest
+    @RequestMapping(path = "/getMyDates")
     public JSONArray getMyDates(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONArray array = new JSONArray();
         int userId = Integer.parseInt(request.getParameter("UserId"));
+        Boolean isAvailable = Boolean.parseBoolean(request.getParameter("HasChooseSeat"));
+        int sortTag = Integer.parseInt(request.getParameter("TagId"));
 
         User user = userService.findById(userId);
-        List<Dating> myDatings = new ArrayList<Dating>(user.getParticipatedDatings());
-        for (Dating dating : myDatings) {
-            JSONObject json = new JSONObject();
-            json.put("DateId", dating.getId());
-            json.put("TagId", dating.getTag().getId());
-            json.put("TagName", dating.getTag().getContent());
-            json.put("DateDesc", dating.getContent());
-            json.put("DateTime", dating.getTime().getTime());
-            array.add(json);
+        List<Dating> myDatings = new ArrayList<Dating>(datingService.getDatingsByUserId(userId));
+        if (sortTag == 0) {
+            // all tags
+            if (!isAvailable) {
+                for (Dating dating : myDatings) {
+                    JSONObject json = new JSONObject();
+                    json.put("DateId", dating.getId());
+                    json.put("TagId", dating.getTag().getId());
+                    json.put("TagName", dating.getTag().getContent());
+                    json.put("DateDesc", dating.getContent());
+                    json.put("Time", dating.getTime().getTime());
+                    array.add(json);
+                }
+            } else {
+                for (Dating dating : myDatings) {
+                    //check if available
+                    if (dating.getParticipants().size() >= dating.getMaxFemale() + dating.getMaxMale())
+                        continue;
+                    JSONObject json = new JSONObject();
+                    json.put("DateId", dating.getId());
+                    json.put("TagId", dating.getTag().getId());
+                    json.put("TagName", dating.getTag().getContent());
+                    json.put("DateDesc", dating.getContent());
+                    json.put("Time", dating.getTime().getTime());
+                    array.add(json);
+                }
+            }
+        } else {
+            //sort by tags
+            if (!isAvailable) {
+                for (Dating dating : myDatings) {
+                    if (dating.getTag().getId() != sortTag)
+                        continue;
+                    JSONObject json = new JSONObject();
+                    json.put("DateId", dating.getId());
+                    json.put("TagId", dating.getTag().getId());
+                    json.put("TagName", dating.getTag().getContent());
+                    json.put("DateDesc", dating.getContent());
+                    json.put("Time", dating.getTime().getTime());
+                    array.add(json);
+                }
+            } else {
+                for (Dating dating : myDatings) {
+                    if (dating.getTag().getId() != sortTag)
+                        continue;
+                    //check if available
+                    if (dating.getParticipants().size() >= dating.getMaxFemale() + dating.getMaxMale())
+                        continue;
+                    JSONObject json = new JSONObject();
+                    json.put("DateId", dating.getId());
+                    json.put("TagId", dating.getTag().getId());
+                    json.put("TagName", dating.getTag().getContent());
+                    json.put("DateDesc", dating.getContent());
+                    json.put("Time", dating.getTime().getTime());
+                    array.add(json);
+                }
+            }
         }
         return array;
     }
@@ -430,7 +475,7 @@ public class APIController {
         JSONObject jsonDating = new JSONObject();
         jsonDating.put("DateDesc", dating.getContent());
         jsonDating.put("DateImgs", dating.getImgs());
-        jsonDating.put("DateTime", dating.getTime().getTime());
+        jsonDating.put("Time", dating.getTime().getTime());
         jsonDating.put("MaleNum", dating.getMaxMale());
         jsonDating.put("FemaleNum", dating.getMaxFemale());
         jsonDating.put("DateHost", dating.getHost().getId());
@@ -443,7 +488,7 @@ public class APIController {
         return res;
     }
 
-    @RequestMapping(path = "/joinDate") //untest
+    @RequestMapping(path = "/joinDate")
     public JSONObject participateDate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONObject json = new JSONObject();
         int userId = Integer.parseInt(request.getParameter("UserId"));
@@ -491,5 +536,71 @@ public class APIController {
         json.put("msg", "success");
         return json;
     }
+
+    @RequestMapping(path = "/leaveDate")
+    public JSONObject leaveDate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONObject json = new JSONObject();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+        int datingId = Integer.parseInt(request.getParameter("DateId"));
+
+        User user = userService.findById(userId);
+        Dating dating = datingService.getDatingById(datingId);
+
+        if (userId != dating.getHost().getId()) {
+            // not host
+            datingService.leaveDatingByOne(datingId, userId);
+            System.out.println(datingId + "--" + userId);
+        } else {
+            // host leaves
+            datingService.delete(datingId);
+        }
+        json.put("msg", "success");
+        return json;
+    }
+
+    @RequestMapping(path = "/addDiscussion")
+    public JSONObject addDiscussion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONObject json = new JSONObject();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+        int dateId = Integer.parseInt(request.getParameter("DateId"));
+        String content = request.getParameter("DisDesc");
+        String res = SensitiveWordTree.censorWords(content);
+        if (!res.equals("未匹配到敏感词")) {
+            json.put("type", "illegal");
+            return json;
+        } else json.put("type", "success");
+
+        Dating dating = datingService.getDatingById(dateId);
+        User user = userService.findById(userId);
+        DateDiscussion discussion = new DateDiscussion();
+        discussion.setHost(user);
+        discussion.setBelong(dating);
+        discussion.setContent(content);
+        discussion.setTime(new Date());
+        discussion.setFloor(dating.getDiscussions().size() + 1);
+        dating.getDiscussions().add(discussion);
+        dateDiscussionService.save(discussion);
+        datingService.update(dating);
+        return json;
+    }
+
+    @RequestMapping(path = "/getDiscussions")
+    public JSONArray getDiscussions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONArray array = new JSONArray();
+        int dateId = Integer.parseInt(request.getParameter("DateId"));
+
+        List<DateDiscussion> discussions = new ArrayList<DateDiscussion>(dateDiscussionService.getDateDiscussionsByDatingId(dateId));
+        for (DateDiscussion discussion : discussions) {
+            JSONObject json = new JSONObject();
+            User owner = discussion.getHost();
+            json.put("UserIcon", owner.getIcon());
+            json.put("UserName", getRandomName());
+            json.put("Time", discussion.getTime().getTime());
+            json.put("Desc", discussion.getContent());
+            array.add(json);
+        }
+        return array;
+    }
+
 
 }

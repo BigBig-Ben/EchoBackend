@@ -39,12 +39,12 @@ public class Dating {
     private Tag tag;
 
     @OneToMany(mappedBy = "belong", fetch = FetchType.EAGER)
-    private Set<DateComment> comments = new HashSet<DateComment>();
+    private Set<DateDiscussion> discussions = new HashSet<DateDiscussion>();
 
     @Override
     public String toString() {
         return "{id=" + id + ", time=" + time + ", content=" + content + ", imgs=" + imgs
-                + ", host=" + host + ", tag=" + tag + ", comments=" + comments + "}";
+                + ", host=" + host + ", tag=" + tag + ", comments=" + discussions + "}";
     }
 
     public Dating() {
@@ -128,8 +128,8 @@ public class Dating {
         return participants;
     }
 
-    public Set<DateComment> getComments() {
-        return comments;
+    public Set<DateDiscussion> getDiscussions() {
+        return discussions;
     }
 
     public int getMaxMale() {

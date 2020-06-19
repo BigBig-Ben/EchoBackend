@@ -33,9 +33,9 @@ public class DatingService {
     }
 
     @Transactional
-    public List<Dating> getAll()
+    public List<Dating> getAllDatings()
     {
-        return (List<Dating>) datingDAO.findAll();
+        return (List<Dating>) datingDAO.getAllDatings();
     }
 
     @Transactional
@@ -44,9 +44,19 @@ public class DatingService {
     }
 
     @Transactional
+    public List<Dating> getDatingsByUserId(int userId){
+        return datingDAO.getDatingsByUserId(userId);
+    }
+
+    @Transactional
     public Dating getDatingById(int id)
     {
         return datingDAO.findById(id).get();
+    }
+
+    @Transactional
+    public void leaveDatingByOne(int datingId, int userId){
+        datingDAO.leaveDatingByOne(datingId, userId);
     }
 
     @Transactional
