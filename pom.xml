@@ -9,13 +9,22 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.demo</groupId>
-	<artifactId>SpringBootTest</artifactId>
+	<artifactId>Echo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	
 	<packaging>jar</packaging>
+		<build>
+			<finalName>EchoAPI</finalName>
+			<plugins>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+				</plugin>
+			</plugins>
+		</build>
 	
-	<name>SpringBootTest</name>
-	<description>Demo project for Spring Boot</description>
+	<name>EchoAPI</name>
+	<description>API for Wechat miniprogram Echo</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -69,13 +78,4 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<finalName>voiceAPI-ROOT</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 </project>

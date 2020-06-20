@@ -18,10 +18,9 @@ public class SensitiveWordTree {
     private static SensitiveWordNode root = null;
     // 敏感词库编码
     private static final String ENCODING = "utf-8";
-    //private static final String ENCODING = "gbk";
     // 敏感词库位置 （这个词库的位置自己要换掉）
-    //private static final String filePath = "/usr/local/voiceAPI/voiceAPI/resource/wd.txt";
-    private static final String filePath = "D:/source group/IDEA/ECHO/resource/wd.txt";
+    private static final String filePath = "/usr/local/voiceResource/wd.txt";
+    //private static final String filePath = "D:/source group/IDEA/ECHO/resource/wd.txt";
 
     /**
      * 读取敏感词库

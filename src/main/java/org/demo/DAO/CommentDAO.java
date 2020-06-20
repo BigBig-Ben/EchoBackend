@@ -13,4 +13,7 @@ public interface CommentDAO extends CrudRepository<Comment,Integer>{
 
     @Query(value = "select * from comment where belong_id = :voiceId order by floor", nativeQuery = true)
     public List<Comment> test(@Param("voiceId") int voiceId);
+
+    @Query(value = "select * from comment where belong_id = :voiceId and floor = :floor",nativeQuery = true)
+    public List<Comment> getTheNewCommentByVoiceFloor(@Param("voiceId") int voiceId, @Param("floor")int floor);
 }

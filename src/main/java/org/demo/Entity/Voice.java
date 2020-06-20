@@ -32,7 +32,7 @@ public class Voice {    //the first layer
 	//private Tag dateTag;
     private String tags;
 
-    @OneToMany(mappedBy = "belong", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "belong", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private Set<Comment> comments = new HashSet<Comment>();
 
     @ManyToMany(mappedBy = "likeVoices", fetch = FetchType.EAGER)

@@ -1,5 +1,6 @@
 package org.demo.service;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -70,6 +71,5 @@ public class UserService {
     public void dislikeComment(int userId, int commentId) {
         userDAO.dislikeComment(userId, commentId);
     }
-
 
 }

@@ -1,13 +1,12 @@
 package org.demo;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.MultipartConfigElement;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -26,22 +25,25 @@ public class EchoApplication {
         SpringApplication.run(EchoApplication.class, args);
     }
 
+    @Value("${cbs.imagesStorePath}")
+    private String imagesPath;
+
     @Bean
     MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
-        //String location = "/usr/local/voiceImgs/";
-        String location = "D:/echoImgs/";
-        File tmpFile = new File(location);
+
+        File tmpFile = new File(imagesPath);
         if (!tmpFile.exists()) {
             tmpFile.mkdirs();
         }
-        factory.setLocation(location);
+        factory.setLocation(imagesPath);
         return factory.createMultipartConfig();
     }
 
     public static void readNicknames() {
         System.out.println("reading nicknames");
-        String fileName = "D:/source group/IDEA/ECHO/resource/nickname.txt";
+        String fileName = "/usr/local/voiceResource/nickname.txt";
+        // String fileName = "D:/source group/IDEA/ECHO/resource/nickname.txt";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "GBK"));
             String str = null;

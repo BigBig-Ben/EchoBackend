@@ -106,6 +106,14 @@ public class Comment {	//the second layer
 		this.host = host;
 	}
 
+	public User getCommented() {
+		return commented;
+	}
+
+	public void setCommented(User commented) {
+		this.commented = commented;
+	}
+
 	public Voice getBelong() {
 		return belong;
 	}

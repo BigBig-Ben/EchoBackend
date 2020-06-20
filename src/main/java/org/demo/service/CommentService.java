@@ -46,4 +46,9 @@ public class CommentService {
 	public List<Comment> getCommentsByVoiceId(int voiceId){
 		return commentDAO.getCommentsByVoiceId(voiceId);
 	}
+
+	@Transactional
+	public List<Comment> getTheNewCommentByVoiceFloor(int voiceId, int floor){
+		return commentDAO.getTheNewCommentByVoiceFloor(voiceId, floor);
+	}
 }

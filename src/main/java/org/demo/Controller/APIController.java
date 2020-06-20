@@ -6,6 +6,7 @@ import java.util.*;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.demo.Entity.*;
 import org.demo.service.*;
 import org.demo.util.SensitiveWordTree;
@@ -39,18 +40,21 @@ public class APIController {
     @Autowired
     private DateDiscussionService dateDiscussionService;
 
+    @Autowired
+    private MessageService messageService;
+
     SimpleDateFormat dateFormat = new SimpleDateFormat("MM月dd日 HH时mm分");
 
     @RequestMapping(path = "/getUserInfo")
     public JSONObject getUserInfo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONObject json = new JSONObject();
         int id = Integer.parseInt(request.getParameter("UserId"));
+
         User user = userService.findById(id);
-        Map<String, Object> temp = new HashMap<String, Object>();
-        temp.put("Gender", user.getGender());
-        temp.put("Icon", user.getIcon());
-        temp.put("Motto", user.getDescription());
-        json = JSONObject.fromObject(temp);
+        json.put("Gender", user.getGender());
+        json.put("Icon", user.getIcon());
+        json.put("Motto", user.getDescription());
+        json.put("BgImg", user.getBackground());
         return json;
     }
 
@@ -86,6 +90,7 @@ public class APIController {
         User user = userService.findById(userId);
 
         json.put("Name", getRandomName());
+        json.put("HostId", voice.getHost().getId());
         json.put("VoiceID", voice.getId());
         json.put("VoiceIcon", user.getIcon());
         json.put("VoiceDesc", voice.getContent());
@@ -220,6 +225,15 @@ public class APIController {
         return json;
     }
 
+    @RequestMapping(path = "/deleteVoice")
+    public JSONObject deleteVoice(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        JSONObject json = new JSONObject();
+        int voiceId = Integer.parseInt(request.getParameter("VoiceId"));
+
+        voiceService.delete(voiceId);
+        return json;
+    }
+
     @RequestMapping(path = "/addUser", method = RequestMethod.POST)
     public JSONObject addUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONObject json = new JSONObject();
@@ -244,7 +258,7 @@ public class APIController {
     public JSONObject addComment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONObject json = new JSONObject();
         Comment comment = new Comment();
-        int userid = Integer.parseInt(request.getParameter("UserId"));
+        int userId = Integer.parseInt(request.getParameter("UserId"));
         int voiceBelongId = Integer.parseInt(request.getParameter("VoiceBelong"));
         String type = request.getParameter("CommentType");
         String content = request.getParameter("CommentDesc");
@@ -255,11 +269,14 @@ public class APIController {
             json.put("type", "illegal");
             return json;
         } else json.put("type", "success");
-        User user = userService.findById(userid);
+        User user = userService.findById(userId);
         Voice voice = voiceService.getVoiceById(voiceBelongId);
 
         if (type.equals("REPLY")) {
             int commentedFloor = Integer.parseInt(request.getParameter("CommentedFloor"));
+            int commentedUser = Integer.parseInt(request.getParameter("CommentedUser"));
+            User commented = userService.findById(commentedUser);
+            comment.setCommented(commented);
             comment.setCommentedFloor(commentedFloor);
             comment.setType(0);
         } else
@@ -271,6 +288,15 @@ public class APIController {
         comment.setTime(new Date());
         comment.setFloor(floor);
         commentService.save(comment);
+        //message
+        List<Comment> newOnes = new ArrayList<Comment>(commentService.getTheNewCommentByVoiceFloor(voiceBelongId, floor));
+        Comment theNewOne = newOnes.get(0);
+        if (type.equals("REPLY")) {
+            int commentedUser = Integer.parseInt(request.getParameter("CommentedUser"));
+            messageService.addMessage(commentedUser, voiceBelongId, theNewOne.getId());
+        } else {
+            messageService.addMessage(voice.getHost().getId(), voiceBelongId, theNewOne.getId());
+        }
         return json;
     }
 
@@ -624,19 +650,19 @@ public class APIController {
         return array;
     }
 
-    @RequestMapping(path = "/getIcons") //untest
+    @RequestMapping(path = "/getIcons")
     public JSONArray getIcons(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONArray array = new JSONArray();
-        for (int i = 0; i < 60; i++) {
+        for (int i = 1; i < 60; i++) {
             JSONObject json = new JSONObject();
             json.put("Id", i);
-            json.put("URL", "http://3p233v4064.qicp.vip/images/icon/" + i + ".png");
+            json.put("URL", "http://121.89.204.192:8080/images/icon/" + i + ".png");
             array.add(json);
         }
         return array;
     }
 
-    @RequestMapping(path = "/setIcon")  //untest
+    @RequestMapping(path = "/setIcon")
     public JSONObject setIcon(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONObject json = new JSONObject();
         int userId = Integer.parseInt(request.getParameter("UserId"));
@@ -649,11 +675,28 @@ public class APIController {
         return json;
     }
 
-    @RequestMapping(path = "/setBackground")    //untest
+    @RequestMapping(path = "/setUser")
+    public JSONObject setUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONObject json = new JSONObject();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+        String imgURL = request.getParameter("Icon");
+        String motto = request.getParameter("Motto");
+        int gender = Integer.parseInt(request.getParameter("Gender"));
+
+        User user = userService.findById(userId);
+        user.setIcon(imgURL);
+        user.setDescription(motto);
+        user.setGender(gender);
+        userService.update(user);
+        json.put("msg", "success");
+        return json;
+    }
+
+    @RequestMapping(path = "/setBg")
     public JSONObject setBackground(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONObject json = new JSONObject();
         int userId = Integer.parseInt(request.getParameter("UserId"));
-        String imgURL = request.getParameter("Background");
+        String imgURL = request.getParameter("BgImg");
 
         User user = userService.findById(userId);
         user.setBackground(imgURL);
@@ -661,4 +704,45 @@ public class APIController {
         json.put("msg", "success");
         return json;
     }
+
+    @RequestMapping(path = "/getMsgComments")
+    public JSONArray getMessageComments(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONArray array = new JSONArray();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+
+        List<Message> messages =messageService.getMessagesByUser(userId);
+        for(Message message:messages){
+            // comment detail
+            Comment comment = commentService.findById(message.getCommentId());
+            JSONObject json = new JSONObject();
+            json.put("Icon", comment.getHost().getIcon());
+            json.put("Time", message.getTime().getTime());
+            json.put("Name", getRandomName());
+            json.put("Desc", comment.getContent());
+            //voice detail
+            Voice voice = voiceService.getVoiceById(message.getVoiceId());
+            JSONObject jsonVoice = new JSONObject();
+            jsonVoice.put("VoiceId", voice.getId());
+            jsonVoice.put("VoiceDesc", voice.getContent());
+            List<String> imgs = voice.getImgs();
+            String[] images = imgs.toArray(new String[imgs.size()]);
+            jsonVoice.put("VoiceImgs", images);
+            jsonVoice.put("TagStr", voice.getTags());
+            json.put("Voice", jsonVoice);
+            array.add(json);
+            // set read
+            messageService.readMessage(userId, message.getCommentId());
+        }
+        return array;
+    }
+
+    @RequestMapping(path = "/getMsgCnt")
+    public JSONObject getMsgCnt(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        JSONObject json = new JSONObject();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+
+        json.put("Count", messageService.getUnreadMessagesCount(userId));
+        return json;
+    }
+
 }

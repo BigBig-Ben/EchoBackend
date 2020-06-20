@@ -16,27 +16,25 @@ import java.io.IOException;
 
 @RestController
 public class ImgController {
+    @Value("${cbs.imagesStorePath}")
+    private String imagesPath;
+
     @RequestMapping(value = "/api/addImg", method = RequestMethod.POST)
     public String uploadImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
         MultipartFile multipartFile = req.getFile("file");
-        //String realPath = "/usr/local/voiceImgs/";
-        String realPath = "D:/echoImgs/";
-        String imgPath = new String();
+
         String imgName = new String();
         try {
-            File dir = new File(realPath);
+            File dir = new File(imagesPath);
             if (!dir.exists()) {
                 dir.mkdir();
             }
-            File file = new File(realPath, System.currentTimeMillis() + ".jpg");
+            File file = new File(imagesPath, System.currentTimeMillis() + ".jpg");
             if (file.exists() == false)
                 file.createNewFile();
             multipartFile.transferTo(file);
-            imgName = "http://3p233v4064.qicp.vip/images/"+file.getName();
-            //imgName = "http://192.168.123.164:8080/images/" + file.getName();
-            //System.out.println("real path: " + realPath);
-            //System.out.println("image name: " + imgName);
+            imgName = "http://121.89.204.192:8080/images/"+file.getName();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
