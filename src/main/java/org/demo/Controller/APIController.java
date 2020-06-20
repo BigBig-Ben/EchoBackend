@@ -240,14 +240,10 @@ public class APIController {
         int userId = Integer.parseInt(request.getParameter("UserId"));
         String description = request.getParameter("description");
         int gender = Integer.parseInt(request.getParameter("gender"));
+        String icon = request.getParameter("icon");
         User user = userService.findById(userId);
 
-        //TODO
-        if (gender == 0)
-            user.setIcon("../imgs/girl.png");   //gender decide
-        else if (gender == 1)
-            user.setIcon("../imgs/boy.png");
-        else user.setIcon("../imgs/unknown.png");
+        user.setIcon(icon);
         user.setDescription(description);
         user.setGender(gender);
         userService.save(user);
@@ -732,6 +728,33 @@ public class APIController {
             array.add(json);
             // set read
             messageService.readMessage(userId, message.getCommentId());
+        }
+        return array;
+    }
+
+    @RequestMapping(path = "/getMsgLikes")
+    public JSONArray getMessageLikes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        JSONArray array = new JSONArray();
+
+        //TODO
+
+        return array;
+    }
+
+    @RequestMapping(path = "/getMsgDates")
+    public JSONArray getMessageDates(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        JSONArray array = new JSONArray();
+        int userId = Integer.parseInt(request.getParameter("UserId"));
+
+        List<Dating> myDatings = new ArrayList<Dating>(datingService.getDatingsByUserId(userId));
+        for (Dating dating : myDatings) {
+            JSONObject json = new JSONObject();
+            json.put("DateId", dating.getId());
+            json.put("TagId", dating.getTag().getId());
+            json.put("TagName", dating.getTag().getContent());
+            json.put("DateDesc", dating.getContent());
+            json.put("Time", dating.getTime().getTime());
+            array.add(json);
         }
         return array;
     }
